@@ -1,5 +1,4 @@
 #include <SoftwareSerial.h>
-
 int ledpin=13;
 int ACrun=2;
 int ACslow=3;
@@ -9,7 +8,6 @@ int lamp=6;
 int lock=7;
 int Humid_Temp=23;
 char appData;
-//int unlock=5;
 int ACstatus=0;
 String inData = "";
 void setup(){
@@ -19,6 +17,7 @@ void setup(){
   pinMode(fpot, OUTPUT);
   pinMode(lamp, OUTPUT);
   pinMode(lock, OUTPUT);
+  
   digitalWrite(ACrun,HIGH);
   digitalWrite(ACslow,HIGH);
   digitalWrite(ACfast,HIGH);
@@ -29,19 +28,16 @@ void setup(){
   Serial1.begin(9600);
   Serial.begin(9600);
   Serial.println("HM10 serial started at 9600");
- // HM10.begin(9600); 
   delay(100);
   
   pinMode(ledpin,OUTPUT);
- // Serial.print("init");
-//  Serial1.print("AT+RENEW");
   ACstatus=0;
 }
 void loop(){
   delay(500);
   int soil_moisture=analogRead(A0); 
-  Serial.print("analog value: ");
-  Serial.println(soil_moisture);
+//  Serial.print("analog value: ");
+//  Serial.println(soil_moisture);
 
   if(soil_moisture<30) {
 
@@ -51,7 +47,7 @@ void loop(){
 
   if((soil_moisture>300)&&(soil_moisture<700)) {
 
-    Serial.println("Humid soil");
+ //   Serial.println("Humid soil");
 
   }
 
@@ -63,14 +59,16 @@ void loop(){
 /////////////////////////////////////////////////////////////
 
   if (Serial1.available()) {           // Read user input if available.
-    
+    Serial.write("fuck");
     delay(100);
 
     
     delay(100);
     appData=Serial1.read();
+    Serial.write(appData);
 
   }
+  Serial.write("shit");
   if(appData=='N'){   
     digitalWrite(ACrun,1);
   
@@ -80,7 +78,7 @@ void loop(){
     Serial.print("temp=");
     Serial.print(Humid_Temp);
   }
-  if(appData=='0'){
+  if(appData=='R'){
       
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -110,7 +108,7 @@ void loop(){
         Serial.print(Humid_Temp);
   
     }
-    if(appData=='1'){
+    if(appData=='S'){
      
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -140,7 +138,7 @@ void loop(){
         Serial.print("temp=");
         Serial.print(Humid_Temp);      
     }
-    if(appData=='2'){
+    if(appData=='F'){
       
       if(ACstatus==0){
         digitalWrite(ACrun,0);
