@@ -13,79 +13,43 @@ char appData;
 char appData2;
 int ACstatus=0;
 String inData = "";
-void setup(){
-  pinMode(ACrun, OUTPUT);
-  pinMode(ACslow, OUTPUT);
-  pinMode(ACfast, OUTPUT);
-  pinMode(fpot, OUTPUT);
-  pinMode(lamp, OUTPUT);
-  pinMode(lock, OUTPUT);
-  
-  digitalWrite(ACrun,HIGH);
-  digitalWrite(ACslow,HIGH);
-  digitalWrite(ACfast,HIGH);
-  digitalWrite(fpot,HIGH);
-  digitalWrite(lamp,HIGH);
-  digitalWrite(lock,HIGH);
-  
-  Serial1.begin(9600);
-  Serial.begin(9600);
-  Serial2.begin(115200);
-  Serial.println("HM10 serial started at 9600");
-  delay(100);
-  
-  pinMode(ledpin,OUTPUT);
-  ACstatus=0;
-}
-void loop(){
-  delay(500);
-  int soil_moisture=analogRead(A0); 
-//  Serial.print("analog value: ");
-//  Serial.println(soil_moisture);
+String wifi_Text="";
+String wifiTemp="";
 
-  if(soil_moisture<30) {
 
-    Serial.println("Dry soil");
-
-  }
-
-  if((soil_moisture>300)&&(soil_moisture<700)) {
-
- //   Serial.println("Humid soil");
-
-  }
-
-  if((soil_moisture>700)&&(soil_moisture<950)){
-    Serial.println("water");
-    digitalWrite(6,LOW);
-  }
-
-/////////////////////////////////////////////////////////////
-
-  if (Serial1.available()) {           // Read user input if available.
-    delay(100);
-
-    
-    delay(100);
-    appData=Serial1.read();
-    Serial.write(appData);
-
-  }
- String wifi_Text="";
+void serialGet(){
+ // Serial.println("get");
   if(Serial2.available()){
-    while(Serial2.available()){
-      appData2=Serial2.read();
-      if(appData2=='<'){
-        while(appData2!='>'){
-          
-          wifi_Text+=appData2;
-          }
-        }
+  char c=Serial2.read();
+  Serial.print(c);
+    if(c=='<' || wifiTemp!=""){
+      wifiTemp+=c;
+       
+      
       
       }
+      if(wifiTemp!="" && c!='>'){
+        wifi_Text+=c;
+      }
+      if(c=='>'){
+//        char** d=strtok(wifi_Text.c_str(),':');
+//        Serial.println("d[0]: " + d[0]);
+//        Serial.println("d[1]: " + d[1]);
+        decision(wifi_Text.substring(0,wifi_Text.indexOf(':')),wifi_Text.substring(wifi_Text.indexOf(':'),wifi_Text.length()-1));
+        wifiTemp="";
+        wifi_Text="";
+       }
     }
- 
-  if(appData=='N' || appData2=="AcOff"){   
+  
+  }
+
+//////////////////////////////////////////////////////////                                 Descision
+
+  void decision(String Topic,String Value){
+      Serial.println("Topic: "+Topic);
+      Serial.println("Value: "+Value);
+      
+      if(appData=='N' || appData2=="AcOff"){   
     digitalWrite(ACrun,1);
   
     digitalWrite(ACslow,1);
@@ -198,4 +162,73 @@ void loop(){
       digitalWrite(lamp,1);
       appData="";
     }
+    
+    
+    
+}
+//////////////////////////////////////////   SETUP
+
+void setup(){
+  pinMode(ACrun, OUTPUT);
+  pinMode(ACslow, OUTPUT);
+  pinMode(ACfast, OUTPUT);
+  pinMode(fpot, OUTPUT);
+  pinMode(lamp, OUTPUT);
+  pinMode(lock, OUTPUT);
+  
+  digitalWrite(ACrun,HIGH);
+  digitalWrite(ACslow,HIGH);
+  digitalWrite(ACfast,HIGH);
+  digitalWrite(fpot,HIGH);
+  digitalWrite(lamp,HIGH);
+  digitalWrite(lock,HIGH);
+  
+  Serial1.begin(9600);
+  Serial.begin(9600);
+  Serial2.begin(115200);
+  Serial.println("HM10 serial started at 9600");
+  delay(100);
+  
+  pinMode(ledpin,OUTPUT);
+  ACstatus=0;
+}
+
+///////////////////////////////////////////   LOOP
+void loop(){
+  delay(500);
+  int soil_moisture=analogRead(A0); 
+//  Serial.print("analog value: ");
+//  Serial.println(soil_moisture);
+
+  if(soil_moisture<30) {
+
+//    Serial.println("Dry soil");
+
+  }
+
+  if((soil_moisture>300)&&(soil_moisture<700)) {
+
+//    Serial.println("Humid soil");
+
+  }
+
+  if((soil_moisture>700)&&(soil_moisture<950)){
+    Serial.println("water");
+    digitalWrite(6,LOW);
+  }
+
+/////////////////////////////////////////////////////////////
+
+  if (Serial1.available()) {           // Read user input if available  from Bluetooth
+    delay(100);
+
+    
+   // delay(100);
+    appData=Serial1.read();
+    Serial.write(appData);
+
+  }
+
+  serialGet();
+  
 }
