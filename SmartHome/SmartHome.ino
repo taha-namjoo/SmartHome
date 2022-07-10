@@ -1,4 +1,6 @@
 #include <SoftwareSerial.h>
+
+///////////////////////////////////////////////////////////////////////////Initialize/////////////////////////////////////
 int ledpin=13;
 int ACrun=2;
 int ACslow=3;
@@ -8,6 +10,7 @@ int lamp=6;
 int lock=7;
 int Humid_Temp=23;
 char appData;
+char appData2;
 int ACstatus=0;
 String inData = "";
 void setup(){
@@ -27,6 +30,7 @@ void setup(){
   
   Serial1.begin(9600);
   Serial.begin(9600);
+  Serial2.begin(115200);
   Serial.println("HM10 serial started at 9600");
   delay(100);
   
@@ -59,7 +63,6 @@ void loop(){
 /////////////////////////////////////////////////////////////
 
   if (Serial1.available()) {           // Read user input if available.
-    Serial.write("fuck");
     delay(100);
 
     
@@ -68,8 +71,21 @@ void loop(){
     Serial.write(appData);
 
   }
-  Serial.write("shit");
-  if(appData=='N'){   
+ String wifi_Text="";
+  if(Serial2.available()){
+    while(Serial2.available()){
+      appData2=Serial2.read();
+      if(appData2=='<'){
+        while(appData2!='>'){
+          
+          wifi_Text+=appData2;
+          }
+        }
+      
+      }
+    }
+ 
+  if(appData=='N' || appData2=="AcOff"){   
     digitalWrite(ACrun,1);
   
     digitalWrite(ACslow,1);
@@ -78,7 +94,7 @@ void loop(){
     Serial.print("temp=");
     Serial.print(Humid_Temp);
   }
-  if(appData=='R'){
+  if(appData=='R' || appData2=="AcRun"){
       
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -108,7 +124,7 @@ void loop(){
         Serial.print(Humid_Temp);
   
     }
-    if(appData=='S'){
+    if(appData=='S'|| appData2=="AcSlow"){
      
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -138,7 +154,7 @@ void loop(){
         Serial.print("temp=");
         Serial.print(Humid_Temp);      
     }
-    if(appData=='F'){
+    if(appData=='F' || appData2=="AcFast"){
       
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -170,13 +186,13 @@ void loop(){
       Serial.print("temp=");
       Serial.print(Humid_Temp); 
     }
-    if(appData=='O'){
+    if(appData=='O' || appData2=="LockOpen"){
       digitalWrite(lock,0);
       delay(1500);
       digitalWrite(lock,1);
       appData="";
     }
-     if(appData=='L'){
+     if(appData=='L' || appData2=="LampOn"){
       digitalWrite(lamp,0);
       delay(1500);
       digitalWrite(lamp,1);
