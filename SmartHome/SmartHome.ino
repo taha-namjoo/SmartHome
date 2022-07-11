@@ -21,7 +21,7 @@ void serialGet(){
  // Serial.println("get");
   if(Serial2.available()){
   char c=Serial2.read();
-  Serial.print(c);
+//  Serial.print(c);
     if(c=='<' || wifiTemp!=""){
       wifiTemp+=c;
        
@@ -35,6 +35,7 @@ void serialGet(){
 //        char** d=strtok(wifi_Text.c_str(),':');
 //        Serial.println("d[0]: " + d[0]);
 //        Serial.println("d[1]: " + d[1]);
+        
         decision(wifi_Text.substring(0,wifi_Text.indexOf(':')),wifi_Text.substring(wifi_Text.indexOf(':'),wifi_Text.length()-1));
         wifiTemp="";
         wifi_Text="";
@@ -150,11 +151,13 @@ void serialGet(){
       Serial.print("temp=");
       Serial.print(Humid_Temp); 
     }
-    if(appData=='O' || appData2=="LockOpen"){
+    //if(appData=='O' || appData2=="LockOpen")
+    if(Topic=="doorLock" && Value=="L"){
       digitalWrite(lock,0);
       delay(1500);
       digitalWrite(lock,1);
       appData="";
+      
     }
      if(appData=='L' || appData2=="LampOn"){
       digitalWrite(lamp,0);
