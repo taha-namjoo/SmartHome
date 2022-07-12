@@ -4,8 +4,8 @@
  
 
 // WiFi
-const char *ssid = "mdhi2000"; // Enter your WiFi name Mohammad's iPhone            mdhi2000
-const char *password = "troplonglaissetomber";  // Enter WiFi password   troplonglaissetomber
+const char *ssid = "Taha"; // Enter your WiFi name Mohammad's iPhone            mdhi2000
+const char *password = "9135813972";  // Enter WiFi password   troplonglaissetomber
 
 // MQTT Broker
 const char *mqtt_broker = "mqtt.mdhi.dev";

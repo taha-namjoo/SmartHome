@@ -47,14 +47,14 @@ String wifiTemp="";
         digitalWrite(ACrun,0);
         digitalWrite(ACslow,1);
         digitalWrite(ACfast,1);
-
+  }
      if(Topic=="ACmotor"&&Value=="0"){
       
   
         digitalWrite(ACrun,0);
         digitalWrite(ACslow,1);
         digitalWrite(ACfast,1);
-
+     }
     if(Topic=="ACmotor"&&Value=="1"){
      
         digitalWrite(ACslow,0);
@@ -86,12 +86,15 @@ String wifiTemp="";
      
     }
     if(Topic=="lamp"&&Value=="1"){
-
+      Serial.println("here");
       digitalWrite(lamp,0);
     }
     
     
-}
+  }
+
+
+ 
 
 ////////////////////////////////////////////////////////////////                 Decision BlueTooth
 
@@ -227,7 +230,7 @@ void serialGet(){
   if(Serial2.available()){
   char c=Serial2.read();
 //  Serial.print(c);
-    if(c=='<' || wifiTemp!=""){
+    if((c=='<' || wifiTemp!="") &&c!='>'){
       wifiTemp+=c;
        
       
@@ -237,13 +240,13 @@ void serialGet(){
         wifi_Text+=c;
       }
 
-        
-        decision(wifi_Text.substring(0,wifi_Text.indexOf(':')),wifi_Text.substring(wifi_Text.indexOf(':'),wifi_Text.length()-1));
+        if (c=='>'){
+        decisionWiFi(wifi_Text.substring(11,wifi_Text.indexOf(':')),wifi_Text.substring(wifi_Text.indexOf(':')+1,wifi_Text.length()));
         wifiTemp="";
         wifi_Text="";
        }
     }
-  
+}
   
 //////////////////////////////////////////   SETUP
 
@@ -274,27 +277,29 @@ void setup(){
 
 ///////////////////////////////////////////   LOOP
 void loop(){
-  delay(500);
+  
   int soil_moisture=analogRead(A0); 
-  Serial.print("analog value: ");
-  Serial.println(soil_moisture);
+ // Serial.print("analog value: ");
+ // Serial.println(soil_moisture);
 ////////////////////////////////////////////// Flower Pot pump
   if(soil_moisture<30) {
 
-    Serial.println("Dry soil");
+//    Serial.println("Dry soil");
 
   }
 
   if((soil_moisture>300)&&(soil_moisture<700)) {
+    digitalWrite(5,HIGH);
 
-    Serial.println("Humid soil");
+   // Serial.println("Humid soil");
 
   }
 
   if((soil_moisture>700)&&(soil_moisture<950)){
     Serial.println("water");
-    digitalWrite(6,LOW);
+    digitalWrite(5,LOW);
   }
+
 
 /////////////////////////////////////////////////////////////           BlueTooth and Wifi Read
 
