@@ -17,40 +17,13 @@ String wifi_Text="";
 String wifiTemp="";
 
 
-void serialGet(){
- // Serial.println("get");
-  if(Serial2.available()){
-  char c=Serial2.read();
-//  Serial.print(c);
-    if(c=='<' || wifiTemp!=""){
-      wifiTemp+=c;
-       
-      
-      
-      }
-      if(wifiTemp!="" && c!='>'){
-        wifi_Text+=c;
-      }
-      if(c=='>'){
-//        char** d=strtok(wifi_Text.c_str(),':');
-//        Serial.println("d[0]: " + d[0]);
-//        Serial.println("d[1]: " + d[1]);
-        
-        decision(wifi_Text.substring(0,wifi_Text.indexOf(':')),wifi_Text.substring(wifi_Text.indexOf(':'),wifi_Text.length()-1));
-        wifiTemp="";
-        wifi_Text="";
-       }
-    }
-  
-  }
+//////////////////////////////////////////////////////////                                 Descision  WIFI
 
-//////////////////////////////////////////////////////////                                 Descision
-
-  void decision(String Topic,String Value){
+  void decisionWiFi(String Topic,String Value){
       Serial.println("Topic: "+Topic);
       Serial.println("Value: "+Value);
       
-      if(appData=='N' || appData2=="AcOff"){   
+     if(Topic=="AC"&&Value=="0"){   
     digitalWrite(ACrun,1);
   
     digitalWrite(ACslow,1);
@@ -59,7 +32,82 @@ void serialGet(){
     Serial.print("temp=");
     Serial.print(Humid_Temp);
   }
-  if(appData=='R' || appData2=="AcRun"){
+  if(Topic=="ACpump"&&Value=="0"){   
+    digitalWrite(ACrun,1);
+  
+    digitalWrite(ACslow,1);
+    digitalWrite(ACfast,1);
+    ACstatus=0;
+    Serial.print("temp=");
+    Serial.print(Humid_Temp);
+  }
+  if(Topic=="ACpump"&&Value=="1"){
+      
+  
+        digitalWrite(ACrun,0);
+        digitalWrite(ACslow,1);
+        digitalWrite(ACfast,1);
+
+     if(Topic=="ACmotor"&&Value=="0"){
+      
+  
+        digitalWrite(ACrun,0);
+        digitalWrite(ACslow,1);
+        digitalWrite(ACfast,1);
+
+    if(Topic=="ACmotor"&&Value=="1"){
+     
+        digitalWrite(ACslow,0);
+        Serial.print("temp=");
+        Serial.print(Humid_Temp);     
+    } 
+    if(Topic=="ACspeed"&&Value=="0"){
+      
+      digitalWrite(ACfast,1);
+      Serial.print("temp=");
+      Serial.print(Humid_Temp); 
+    }
+    if(Topic=="ACspeed"&&Value=="1"){
+      
+      digitalWrite(ACfast,0);
+      Serial.print("temp=");
+      Serial.print(Humid_Temp); 
+    }
+    if(Topic=="doorLock"&&Value=="L")
+    {
+      digitalWrite(lock,0);
+      delay(1500);
+      digitalWrite(lock,1);
+      
+    }
+     if(Topic=="lamp"&&Value=="0"){
+
+      digitalWrite(lamp,1);
+     
+    }
+    if(Topic=="lamp"&&Value=="1"){
+
+      digitalWrite(lamp,0);
+    }
+    
+    
+}
+
+////////////////////////////////////////////////////////////////                 Decision BlueTooth
+
+  void decisionBlu(){
+
+      
+      if(appData=='A' ){   
+    digitalWrite(ACrun,1);
+  
+    digitalWrite(ACslow,1);
+    digitalWrite(ACfast,1);
+    ACstatus=0;
+    Serial.print("temp=");
+    Serial.print(Humid_Temp);
+  }
+  if(appData=='P' ){
       
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -89,7 +137,7 @@ void serialGet(){
         Serial.print(Humid_Temp);
   
     }
-    if(appData=='S'|| appData2=="AcSlow"){
+    if(appData=='S'){
      
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -119,7 +167,7 @@ void serialGet(){
         Serial.print("temp=");
         Serial.print(Humid_Temp);      
     }
-    if(appData=='F' || appData2=="AcFast"){
+    if(appData=='F'){
       
       if(ACstatus==0){
         digitalWrite(ACrun,0);
@@ -151,17 +199,20 @@ void serialGet(){
       Serial.print("temp=");
       Serial.print(Humid_Temp); 
     }
-    //if(appData=='O' || appData2=="LockOpen")
-    if(Topic=="doorLock" && Value=="L"){
+    if(appData=='D')
+    {
       digitalWrite(lock,0);
       delay(1500);
       digitalWrite(lock,1);
       appData="";
       
     }
-     if(appData=='L' || appData2=="LampOn"){
+     if(appData=='N'){
       digitalWrite(lamp,0);
-      delay(1500);
+      appData="";
+    }
+    if(appData=='O'){
+     
       digitalWrite(lamp,1);
       appData="";
     }
@@ -169,6 +220,31 @@ void serialGet(){
     
     
 }
+
+////////////////////////////////////////////////////// Serial Get
+void serialGet(){
+ // Serial.println("get");
+  if(Serial2.available()){
+  char c=Serial2.read();
+//  Serial.print(c);
+    if(c=='<' || wifiTemp!=""){
+      wifiTemp+=c;
+       
+      
+      
+      }
+      if(wifiTemp!="" && c!='>'){
+        wifi_Text+=c;
+      }
+
+        
+        decision(wifi_Text.substring(0,wifi_Text.indexOf(':')),wifi_Text.substring(wifi_Text.indexOf(':'),wifi_Text.length()-1));
+        wifiTemp="";
+        wifi_Text="";
+       }
+    }
+  
+  
 //////////////////////////////////////////   SETUP
 
 void setup(){
@@ -200,18 +276,18 @@ void setup(){
 void loop(){
   delay(500);
   int soil_moisture=analogRead(A0); 
-//  Serial.print("analog value: ");
-//  Serial.println(soil_moisture);
-
+  Serial.print("analog value: ");
+  Serial.println(soil_moisture);
+////////////////////////////////////////////// Flower Pot pump
   if(soil_moisture<30) {
 
-//    Serial.println("Dry soil");
+    Serial.println("Dry soil");
 
   }
 
   if((soil_moisture>300)&&(soil_moisture<700)) {
 
-//    Serial.println("Humid soil");
+    Serial.println("Humid soil");
 
   }
 
@@ -220,15 +296,16 @@ void loop(){
     digitalWrite(6,LOW);
   }
 
-/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////           BlueTooth and Wifi Read
 
   if (Serial1.available()) {           // Read user input if available  from Bluetooth
     delay(100);
 
     
-   // delay(100);
+    delay(100);
     appData=Serial1.read();
-    Serial.write(appData);
+    //Serial.write(appData);
+    decisionBlu();
 
   }
 
